@@ -1,9 +1,23 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = (env) => {
+  const basePlugins = [
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Webpack App',
+      filename: 'index.html',
+      template: 'src/template.html'
+    })
+  ]
   const isDevelopment = process.env.NODE_ENV === 'development'
+  const plugins = isDevelopment
+    ? basePlugins
+    : [...basePlugins, new BundleAnalyzerPlugin()]
   return {
     mode: isDevelopment ? 'development' : 'production',
     entry: {
@@ -47,16 +61,7 @@ module.exports = (env) => {
         }
       ]
     },
-    plugins: [
-      new MiniCssExtractPlugin({
-        filename: '[name].[contenthash].css'
-      }),
-      new HtmlWebpackPlugin({
-        title: 'Webpack App',
-        filename: 'index.html',
-        template: 'src/template.html'
-      })
-    ],
+    plugins,
     devServer: {
       static: {
         directory: 'dist' // Đường dẫn tương đối đến với thư mục chứa index.html
